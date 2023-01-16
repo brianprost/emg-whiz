@@ -1,0 +1,22 @@
+item_id,cat_id,item_name
+1,1,Upper extremity numbness
+2,1,Facial numbness
+5,7,Generalized weakness
+6,7,Proximal weakness
+8,1,Lower extremity weakness
+13,1,Facial weakness
+14,1,Lower extremity numbness
+15,1,Upper extremity weakness
+16,7,Distal weakness
+17,7,Distal numbness
+18,1,Upper extremity pain
+19,1,Lower extremity pain
+20,7,Multifocal weakness
+21,1,Foot drop
+22,1,Numbness in the ulnar distribution
+23,1,Numbness in the median distribution
+24,1,Wrist drop
+25,1,Knee extension weakness
+26,1,Shoulder abduction weakness
+27,7,Dysarthria
+28,7,Ptosis
