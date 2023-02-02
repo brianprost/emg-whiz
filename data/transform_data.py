@@ -105,9 +105,21 @@ for file_transformation in file_transformations:
         f'transformed/{file_transformation["export_file_name"]}', index=False)
 
 
+transformations_dict = {
+    'cases main': {
+        'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
+        'cases_diagnosis_ncs_criteria_transformation': cases_diagnosis_ncs_criteria_transformation,
+        'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
+        'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
+        'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
+    }
+}
+
+
+
 def cases_diagnosis_diagnosis_transformation():
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
-    pass
+    return
 
 
 def cases_diagnosis_ncs_criteria_transformation():
@@ -132,7 +144,7 @@ def cases_differential_criteria_transformation():
 
 def cases_main_cc_transformation():
     # Use case_id to match item_id in table "cc relations", then get the actual name from table "cc names". Separate names by comma (i.e. "A, B, C")
-    pass
+    
 
 
 def muscles_main_root_transformation():
