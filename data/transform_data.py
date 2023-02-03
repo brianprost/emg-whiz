@@ -144,8 +144,8 @@ def cases_differential_criteria_transformation():
 
 def cases_main_cc_transformation():
     # Use case_id to match item_id in table "cc relations", then get the actual name from table "cc names". Separate names by comma (i.e. "A, B, C")
+    pass
     
-
 
 def muscles_main_root_transformation():
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
