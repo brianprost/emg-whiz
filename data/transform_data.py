@@ -26,14 +26,15 @@ file_transformations = [
                 'isDelete': True,
                 'column_to_transform': 'case_num',
             },
-            # {
-            #     # TODO this is the CC transformation and it's fucking hard
-            #     'isDelete': False,
-            #     'file_with_name': 'cc relations.xlsx',
-            #     'column_to_transform': 'CC',
-            #     'column_with_name': 'item_id',
-            #     'primary_key': 'case_id',
-            # }
+            {
+                'isDelete': False,
+                'isSpecial': True,
+                'specialTransform': {
+                    'functions': [
+                        'cases_main_cc_transformation',
+                    ],
+                }
+            }
         ],
         'export_file_name': 'cases main transformed.xlsx',
     },
@@ -74,47 +75,48 @@ file_transformations = [
     }
 ]
 
-for file_transformation in file_transformations:
-    # Read in the file_to_transform file
-    to_transform_df = pd.read_excel(
-        f'original/{file_transformation["file_to_transform"]}')
 
-    # Loop through the column transformations
-    for column_transformation in file_transformation['column_transformations']:
-        print(
-            f'Transforming {column_transformation["column_to_transform"]} in {file_transformation["file_to_transform"]}')
-        # If the column is to be deleted, delete it and continue to the next column transformation
-        if column_transformation['isDelete']:
-            print(f'Deleting {column_transformation["column_to_transform"]}')
-            del to_transform_df[column_transformation['column_to_transform']]
-            continue
+def main():
+    for file_transformation in file_transformations:
+        # Read in the file_to_transform file
+        to_transform_df = pd.read_excel(
+            f'original/{file_transformation["file_to_transform"]}')
 
-        # Read in the file_with_name file
-        with_name_df = pd.read_excel(
-            f'original/{column_transformation["file_with_name"]}')
+        # Loop through the column transformations
+        for column_transformation in file_transformation['column_transformations']:
+            print(
+                f'Transforming {column_transformation["column_to_transform"]} in {file_transformation["file_to_transform"]}')
+            # If the column is to be deleted, delete it and continue to the next column transformation
+            if column_transformation['isDelete']:
+                print(
+                    f'Deleting {column_transformation["column_to_transform"]}')
+                del to_transform_df[column_transformation['column_to_transform']]
+                continue
 
-        # Create a dictionary to map ID to nerve/muscle names
-        name_dict = with_name_df.set_index(
-            column_transformation['primary_key'])[column_transformation['column_with_name']].to_dict()
+            # Read in the file_with_name file
+            with_name_df = pd.read_excel(
+                f'original/{column_transformation["file_with_name"]}')
 
-        # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
-        to_transform_df[column_transformation['column_to_transform']
-                        ] = to_transform_df[column_transformation['column_to_transform']].map(name_dict)
-    # Save the modified file_to_transformed file
-    to_transform_df.to_excel(
-        f'transformed/{file_transformation["export_file_name"]}', index=False)
+            # Create a dictionary to map ID to nerve/muscle names
+            name_dict = with_name_df.set_index(
+                column_transformation['primary_key'])[column_transformation['column_with_name']].to_dict()
 
+            # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
+            to_transform_df[column_transformation['column_to_transform']
+                            ] = to_transform_df[column_transformation['column_to_transform']].map(name_dict)
+        # Save the modified file_to_transformed file
+        to_transform_df.to_excel(
+            f'transformed/{file_transformation["export_file_name"]}', index=False)
 
-transformations_dict = {
-    'cases main': {
-        'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
-        'cases_diagnosis_ncs_criteria_transformation': cases_diagnosis_ncs_criteria_transformation,
-        'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
-        'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
-        'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
+    transformations_dict = {
+        'cases main': {
+            'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
+            'cases_diagnosis_ncs_criteria_transformation': cases_diagnosis_ncs_criteria_transformation,
+            'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
+            'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
+            'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
+        }
     }
-}
-
 
 
 def cases_diagnosis_diagnosis_transformation():
@@ -142,10 +144,38 @@ def cases_differential_criteria_transformation():
     pass
 
 
-def cases_main_cc_transformation():
+def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_file, output_file):
     # Use case_id to match item_id in table "cc relations", then get the actual name from table "cc names". Separate names by comma (i.e. "A, B, C")
-    pass
-    
+
+    # Load the "cases main" table
+    df_cases_main = pd.read_excel(f"original/{cases_main_file}")
+
+    # Load the "cc relations" table
+    df_relations = pd.read_excel(f"original/{cc_relations_file}")
+
+    # load the "cc names" table
+    df_names = pd.read_excel(f"original/{cc_names_file}")
+
+    # Create a dictionary to map ID to nerve/muscle names
+    name_dict = df_names.set_index('item_id')['item_name'].to_dict()
+
+    # Loop through each row in the "cases main" table
+    for index, row in df_cases_main.iterrows():
+        # Create a list to hold the names of the cc's
+        cc_names = []
+
+        # Loop through each row in the "cc relations" table
+        for index2, row2 in df_relations.iterrows():
+            # If the case_id in the "cc relations" table matches the current case_id in the "cases main" table, add the name of the cc to the list
+            if row2['case_id'] == row['case_id']:
+                cc_names.append(name_dict[row2['item_id']])
+
+        # Add the list of cc names to the "cc" column in the "cases main" table
+        df_cases_main.at[index, 'CC'] = ', '.join(cc_names)
+
+    # Save the modified "cases main" table
+    df_cases_main.to_excel(f"transformed/{output_file}", index=False)
+
 
 def muscles_main_root_transformation():
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
@@ -155,3 +185,11 @@ def muscles_main_root_transformation():
 def modules_main_cases_transformation():
     # Create comma separated list by matching ID with "module_id" from table "module cases (to destroy)" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
     pass
+
+
+if __name__ == '__main__':
+    # cases_main_cc_transformation(
+    #     'cases main transformed.xlsx', 'cases main.xlsx', 'cc')
+
+    cases_main_cc_transformation(
+        "cases main.xlsx", "cc relations.xlsx", "cc names.xlsx", "cases main transformed.xlsx")
