@@ -7,6 +7,52 @@ shutil.os.mkdir('transformed')
 
 file_transformations = [
     {
+        'file_to_transform': 'cases abnormal muscles.xlsx',
+        'column_transformations': [
+            {
+                'isDelete': False,
+                'file_with_name': 'muscles main.xlsx',
+                'column_to_transform': 'Name',
+                'column_with_name': 'Name',
+                'primary_key': 'ID',
+            }
+        ],
+        'export_file_name': 'cases abnormal muscles transformed.xlsx',
+    },
+    {
+        'file_to_transform': 'cases abnormal nerves.xlsx',
+        'column_transformations': [
+            {
+                'isDelete': False,
+                'file_with_name': 'nerves main.xlsx',
+                'column_to_transform': 'Name',
+                'column_with_name': 'Name',
+                'primary_key': 'ID',
+            }
+        ],
+        'export_file_name': 'cases abnormal nerves transformed.xlsx',
+    },
+    {
+        'file_to_transform': 'cases diagnosis.xlsx',
+        'column_transformations': [
+            {
+                'isDelete': False,
+                'file_with_name': 'diagnoses names (to destroy).xlsx',
+                'column_to_transform': 'Diagnosis',
+                'column_with_name': 'diag_name',
+                'primary_key': 'diag_name_id',
+            },
+            {
+                'isDelete': False,
+                'isSpecial': True,
+                'specialTransform': [
+                    'cases_diagnosis_ncs_criteria_transformation',
+                    'cases_diagnosis_emg_criteria_transformation',
+                ],
+            }
+        ],
+    },
+    {
         'file_to_transform': 'cc relations.xlsx',
         'column_transformations': [
             {
@@ -29,11 +75,9 @@ file_transformations = [
             {
                 'isDelete': False,
                 'isSpecial': True,
-                'specialTransform': {
-                    'functions': [
-                        'cases_main_cc_transformation',
-                    ],
-                }
+                'specialTransform': [
+                    'cases_main_cc_transformation',
+                ],
             }
         ],
         'export_file_name': 'cases main transformed.xlsx',
@@ -46,32 +90,6 @@ file_transformations = [
                 'column_to_transform': 'ID',
             },
         ],
-    },
-    {
-        'file_to_transform': 'cases abnormal nerves.xlsx',
-        'column_transformations': [
-            {
-                'isDelete': False,
-                'file_with_name': 'nerves main.xlsx',
-                'column_to_transform': 'Name',
-                'column_with_name': 'Name',
-                'primary_key': 'ID',
-            }
-        ],
-        'export_file_name': 'cases abnormal nerves transformed.xlsx',
-    },
-    {
-        'file_to_transform': 'cases abnormal muscles.xlsx',
-        'column_transformations': [
-            {
-                'isDelete': False,
-                'file_with_name': 'muscles main.xlsx',
-                'column_to_transform': 'Name',
-                'column_with_name': 'Name',
-                'primary_key': 'ID',
-            }
-        ],
-        'export_file_name': 'cases abnormal muscles transformed.xlsx',
     }
 ]
 
