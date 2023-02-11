@@ -149,9 +149,6 @@ file_transformations = [
 
 
 def main():
-    for file_transformation in file_transformations:
-        pass
-
     transformations_dict = {
         'simple_transformation': simple_transformation,
         'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
@@ -160,6 +157,10 @@ def main():
         'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
         'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
     }
+    
+    for file_transformation in file_transformations:
+        pass
+
 
 
 def simple_transformation(isDelete,
@@ -238,7 +239,7 @@ def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_fi
     df_names = pd.read_excel(f"original/{cc_names_file}")
 
     # Create a dictionary to map ID to nerve/muscle names
-    name_dict = df_names.set_index('item_id')['item_name'].to_dict()
+    name_dict = df_names.set_index('item_id')['item_name'].apply(str.strip).to_dict()
 
     # Loop through each row in the "cases main" table
     for index, row in df_cases_main.iterrows():
@@ -254,7 +255,7 @@ def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_fi
         # Add the list of cc names to the "cc" column in the "cases main" table
         df_cases_main.at[index, 'CC'] = ', '.join(cc_names)
 
-    # Save the modified "cases main" table
+    # Save the modified "cases main" table with utf-8 encoding
     df_cases_main.to_excel(f"transformed/{output_file}", index=False)
 
 
