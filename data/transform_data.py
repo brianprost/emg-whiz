@@ -1,7 +1,8 @@
 import pandas as pd
+import shutil
+import sys
 
 # delete contents of transformed folder
-import shutil
 shutil.rmtree('transformed')
 shutil.os.mkdir('transformed')
 
@@ -152,14 +153,12 @@ def main():
         pass
 
     transformations_dict = {
-        'cases main': {
-            'simple_transformation': simple_transformation,
-            'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
-            'cases_diagnosis_ncs_criteria_transformation': cases_diagnosis_ncs_criteria_transformation,
-            'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
-            'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
-            'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
-        }
+        'simple_transformation': simple_transformation,
+        'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
+        'cases_diagnosis_ncs_criteria_transformation': cases_diagnosis_ncs_criteria_transformation,
+        'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
+        'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
+        'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
     }
 
 
