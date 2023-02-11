@@ -187,6 +187,16 @@ def modules_main_cases_transformation():
     pass
 
 
+def to_xlsx(file_name, sheet_name, df):
+    writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
+    df.to_excel(writer, sheet_name=sheet_name, index=False)
+    writer.save()
+
+
+def to_csv(file_name, df):
+    df.to_csv(file_name, index=False)
+
+
 if __name__ == '__main__':
     # cases_main_cc_transformation(
     #     'cases main transformed.xlsx', 'cases main.xlsx', 'cc')
