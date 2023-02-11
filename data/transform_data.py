@@ -38,7 +38,7 @@ file_transformations = [
         'export_file_name': 'cases abnormal nerves transformed.xlsx',
     },
     {
-        'file_to_transform': 'cases diagnosis.xlsx',
+        'file_to_transform': 'cases diagnoses.xlsx',
         'column_transformations': [
             {
                 'simple_transformation': {
@@ -157,73 +157,94 @@ def main():
         'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
         'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
     }
-    
-    for file_transformation in file_transformations:
-        pass
 
+    # Loop through the file transformations objects
+    for file_transformation in file_transformations:
+        print(f'Starting {file_transformation["file_to_transform"]}')
+
+        # Read in the file_to_transform file
+        to_transform_df = pd.read_excel(
+            f'original/{file_transformation["file_to_transform"]}')
+
+        # sequentially loop through each column transformations objects
+        for column_transformation in file_transformation['column_transformations']:
+
+            # if this transformation is a simple transformation, then run it
+            if not not column_transformation.get('simple_transformation'):
+
+                simple_transformation_dict = column_transformation['simple_transformation']
+
+                # read in the file_with_name file
+                with_name_df = pd.read_excel(
+                    f'original/{simple_transformation_dict["file_with_name"]}')
+
+                # Run the simple transformation
+                simple_transformation(
+                    isDelete=simple_transformation_dict['isDelete'],
+                    to_transform_df=to_transform_df,
+                    with_name_df=with_name_df,
+                    column_to_transform=simple_transformation_dict['column_to_transform'],
+                    column_with_name=simple_transformation_dict['column_with_name'],
+                    primary_key=simple_transformation_dict['primary_key'],
+                )
+
+                continue
+
+            # Get the transformation function from the transformations_dict
+            transformation_function = transformations_dict[
+                list(column_transformation.keys())[0]]
+
+            # Run the transformation function
+            to_transform_df = transformation_function(
+                to_transform_df, column_transformation)
 
 
 def simple_transformation(isDelete,
-                          file_with_name,
+                          to_transform_df,
+                          with_name_df,
                           column_to_transform,
                           column_with_name,
                           primary_key):
-    # Read in the file_with_name file
-    with_name_df = pd.read_excel(f'original/{file_with_name}')
-    # Read in the file_to_transform file
-    to_transform_df = pd.read_excel(
-        f'original/{file_transformation["file_to_transform"]}')
 
-    # Loop through the column transformations
-    for column_transformation in file_transformation['column_transformations']:
-        print(
-            f'Transforming {column_transformation["column_to_transform"]} in {file_transformation["file_to_transform"]}')
-        # If the column is to be deleted, delete it and continue to the next column transformation
-        if column_transformation['isDelete']:
-            print(
-                f'Deleting {column_transformation["column_to_transform"]}')
-            del to_transform_df[column_transformation['column_to_transform']]
-            continue
+    print('would be running simple_transformation')
+    # # If the column is to be deleted, delete it and continue to the next column transformation
+    # if isDelete:
+    #     del to_transform_df[column_to_transform]
 
-        # Read in the file_with_name file
-        with_name_df = pd.read_excel(
-            f'original/{column_transformation["file_with_name"]}')
+    # # Create a dictionary to map ID to nerve/muscle names
+    # name_dict = with_name_df.set_index(
+    #     primary_key)[column_with_name].to_dict()
 
-        # Create a dictionary to map ID to nerve/muscle names
-        name_dict = with_name_df.set_index(
-            column_transformation['primary_key'])[column_transformation['column_with_name']].to_dict()
-
-        # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
-        to_transform_df[column_transformation['column_to_transform']
-                        ] = to_transform_df[column_transformation['column_to_transform']].map(name_dict)
-    # Save the modified file_to_transformed file
-    to_transform_df.to_excel(
-        f'transformed/{file_transformation["export_file_name"]}', index=False)
+    # # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
+    # to_transform_df[column_to_transform] = to_transform_df[column_to_transform].map(
+    #     name_dict)
+    
+    # return to_transform_df
 
 
 def cases_diagnosis_diagnosis_transformation():
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
-    return
+    print('would be running cases_diagnosis_diagnosis_transformation')
 
 
 def cases_diagnosis_ncs_criteria_transformation():
     # Get from table "diagnoses relations (to destroy)" columns ns_compounds and ns_logic
-    pass
+    print('would be running cases_diagnosis_ncs_criteria_transformation')
 
 
 def cases_diagnosis_emg_criteria_transformation():
     # Get from table "diagnoses relations (to destroy)" columns ms_compounds and ms_logic
-    pass
+    print('would be running cases_diagnosis_emg_criteria_transformation')
 
 
 def cases_differential_diagnosis_transformation():
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
-    pass
+    print('would be running cases_differential_diagnosis_transformation')
 
 
 def cases_differential_criteria_transformation():
     # Get from logic tab below
-    pass
+    print('would be running cases_differential_criteria_transformation')
 
 
 def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_file, output_file):
@@ -239,7 +260,8 @@ def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_fi
     df_names = pd.read_excel(f"original/{cc_names_file}")
 
     # Create a dictionary to map ID to nerve/muscle names
-    name_dict = df_names.set_index('item_id')['item_name'].apply(str.strip).to_dict()
+    name_dict = df_names.set_index(
+        'item_id')['item_name'].apply(str.strip).to_dict()
 
     # Loop through each row in the "cases main" table
     for index, row in df_cases_main.iterrows():
@@ -261,12 +283,12 @@ def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_fi
 
 def muscles_main_root_transformation():
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
-    pass
+    print('would be running muscles_main_root_transformation')
 
 
 def modules_main_cases_transformation():
     # Create comma separated list by matching ID with "module_id" from table "module cases (to destroy)" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
-    pass
+    print('would be running modules_main_cases_transformation')
 
 
 def to_xlsx(file_name, sheet_name, df):
@@ -281,13 +303,15 @@ def to_csv(file_name, df):
 
 if __name__ == '__main__':
 
-    # get from command line argument the desired output type
-    output_type = sys.argv[1]
+    main()
 
-    # if output type is not csv or xlsx, exit
-    if output_type != 'csv' and output_type != 'xlsx':
-        print('Invalid output type. Must only be "csv" or "xlsx"')
-        exit()
+    # # get from command line argument the desired output type
+    # output_type = sys.argv[1]
 
-    cases_main_cc_transformation(
-        "cases main.xlsx", "cc relations.xlsx", "cc names.xlsx", "cases main transformed.xlsx")
+    # # if output type is not csv or xlsx, exit
+    # if output_type != 'csv' and output_type != 'xlsx':
+    #     print('Invalid output type. Must only be "csv" or "xlsx"')
+    #     exit()
+
+    # cases_main_cc_transformation(
+    #     "cases main.xlsx", "cc relations.xlsx", "cc names.xlsx", "cases main transformed.xlsx")
