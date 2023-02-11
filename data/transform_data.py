@@ -57,20 +57,22 @@ file_transformations = [
         ],
     },
     {
-        'file_to_transform': 'cc relations.xlsx',
+        'file_to_transform': 'cases differential.xlsx',
         'column_transformations': [
             {
-                'simple_transformation':
-                {
+                'simple_transformation': {
+                    # get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
                     'isDelete': False,
-                    'file_with_name': 'cc names.xlsx',
-                    'column_to_transform': 'item_id',
-                    'column_with_name': 'item_name',
-                    'primary_key': 'item_id',
-                }
-            }
+                    'file_with_name': 'diagnoses names (to destroy).xlsx',
+                    'column_to_transform': 'Diagnosis',
+                    'column_with_name': 'diag_name',
+                    'primary_key': 'diag_name_id',
+                },
+            },
+            {
+                'cases_differential_criteria_transformation'
+            },
         ],
-        'export_file_name': 'cc relations transformed.xlsx',
     },
     {
         'file_to_transform': 'cases main.xlsx',
@@ -88,7 +90,51 @@ file_transformations = [
         'export_file_name': 'cases main transformed.xlsx',
     },
     {
+        'file_to_transform': 'cc relations.xlsx',
+        'column_transformations': [
+            {
+                'simple_transformation':
+                {
+                    'isDelete': False,
+                    'file_with_name': 'cc names.xlsx',
+                    'column_to_transform': 'item_id',
+                    'column_with_name': 'item_name',
+                    'primary_key': 'item_id',
+                }
+            }
+        ],
+        'export_file_name': 'cc relations transformed.xlsx',
+    },
+    {
         'file_to_transform': 'modules main.xlsx',
+        'column_transformations': [
+            {
+                'simple_transformation': {
+                    'isDelete': True,
+                    'column_to_transform': 'ID',
+                },
+            },
+            {
+                'modules_main_cases_transformation',
+            },
+        ],
+    },
+    {
+        'file_to_transform': 'muscles main.xlsx',
+        'column_transformations': [
+            {
+                'muscles_main_root_transformation',
+            },
+            {
+                'simple_transformation': {
+                    'isDelete': True,
+                    'column_to_transform': 'ID',
+                },
+            },
+        ],
+    },
+    {
+        'file_to_transform': 'nerves main.xlsx',
         'column_transformations': [
             {
                 'simple_transformation': {
