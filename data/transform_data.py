@@ -168,7 +168,8 @@ def main():
                     f'is simple because {list(column_transformation.keys())[0]}')
 
                 # read in the file_with_name file
-                with_name_df = pd.read_excel(
+                if not column_transformation.get('isDelete'):
+                    with_name_df = pd.read_excel(
                     f'original/{column_transformation["file_with_name"]}')
 
                 # Run the simple transformation
