@@ -154,7 +154,7 @@ def main():
 
     # Loop through the file transformations objects
     for file_transformation in file_transformations:
-        print(f'Starting {file_transformation["file_to_transform"]}')
+        print(f'\n\nStarting {file_transformation["file_to_transform"]}')
 
         # Read in the file_to_transform file
         to_transform_df = pd.read_excel(
@@ -165,8 +165,6 @@ def main():
 
             # if this transformation is a simple transformation, then run it
             if column_transformation.get('transformation') == 'simple_transformation':
-                print(
-                    f'is simple because {list(column_transformation.keys())[0]}')
 
                 # read in the file_with_name file
                 if not column_transformation.get('isDelete'):
