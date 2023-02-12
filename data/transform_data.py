@@ -147,6 +147,7 @@ def main():
         'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
         'cases_differential_diagnosis_transformation': cases_differential_diagnosis_transformation,
         'cases_differential_criteria_transformation': cases_differential_criteria_transformation,
+        'cases_main_cc_transformation': cases_main_cc_transformation,
         'muscles_main_root_transformation': muscles_main_root_transformation,
         'modules_main_cases_transformation': modules_main_cases_transformation,
     }
@@ -180,10 +181,11 @@ def main():
                     transformations_dict[column_transformation['transformation']]()
 
                 except Exception as e:
-                    print(f'Error in {column_transformation}')
+                    print(f'\n\nError in {column_transformation}\nError was {e}\n\n')
 
 
 def simple_transformation(column_transformation):
+    # return updated dataframe
 
     print('would be running simple_transformation')
     # # If the column is to be deleted, delete it and continue to the next column transformation
@@ -203,31 +205,37 @@ def simple_transformation(column_transformation):
 
 def cases_diagnosis_diagnosis_transformation():
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
+    # return updated dataframe
     print('would be running cases_diagnosis_diagnosis_transformation')
 
 
 def cases_diagnosis_ncs_criteria_transformation():
     # Get from table "diagnoses relations (to destroy)" columns ns_compounds and ns_logic
+    # return updated dataframe
     print('would be running cases_diagnosis_ncs_criteria_transformation')
 
 
 def cases_diagnosis_emg_criteria_transformation():
     # Get from table "diagnoses relations (to destroy)" columns ms_compounds and ms_logic
+    # return updated dataframe
     print('would be running cases_diagnosis_emg_criteria_transformation')
 
 
 def cases_differential_diagnosis_transformation():
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
+    # return updated dataframe
     print('would be running cases_differential_diagnosis_transformation')
 
 
 def cases_differential_criteria_transformation():
     # Get from logic tab below
+    # return updated dataframe
     print('would be running cases_differential_criteria_transformation')
 
 
 def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_file, output_file):
     # Use case_id to match item_id in table "cc relations", then get the actual name from table "cc names". Separate names by comma (i.e. "A, B, C")
+    # return updated dataframe
     print('would be running cases_main_cc_transformation')
 
     # # Load the "cases main" table
@@ -263,11 +271,13 @@ def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_fi
 
 def muscles_main_root_transformation():
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
+    # return updated dataframe
     print('would be running muscles_main_root_transformation')
 
 
 def modules_main_cases_transformation():
     # Create comma separated list by matching ID with "module_id" from table "module cases (to destroy)" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
+    # return updated dataframe
     print('would be running modules_main_cases_transformation')
 
 
