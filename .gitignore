@@ -94,3 +94,6 @@ celerybeat-schedule
 
 # mac
 .DS_Store
+
+# temporarily ignore transformed
+!transformed/

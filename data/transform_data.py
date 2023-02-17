@@ -176,7 +176,7 @@ def main():
             else:
                 try:
                     # Get the transformation function from the transformations_dict
-                    transformations_dict[column_transformation['transformation']]()
+                    to_transform_df = transformations_dict[column_transformation['transformation']](to_transform_df)
 
                 except Exception as e:
                     print(f'\n\nError in {column_transformation}\nError was {e}\n\n')
@@ -201,79 +201,76 @@ def simple_transformation(column_transformation):
     # return to_transform_df
 
 
-def cases_diagnosis_diagnosis_transformation():
+def cases_diagnosis_diagnosis_transformation(to_transform_df):
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
     # return updated dataframe
     print('would be running cases_diagnosis_diagnosis_transformation')
 
 
-def cases_diagnosis_ncs_criteria_transformation():
+def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     # Get from table "diagnoses relations (to destroy)" columns ns_compounds and ns_logic
     # return updated dataframe
     print('would be running cases_diagnosis_ncs_criteria_transformation')
 
 
-def cases_diagnosis_emg_criteria_transformation():
+def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # Get from table "diagnoses relations (to destroy)" columns ms_compounds and ms_logic
     # return updated dataframe
     print('would be running cases_diagnosis_emg_criteria_transformation')
 
 
-def cases_differential_diagnosis_transformation():
+def cases_differential_diagnosis_transformation(to_transform_df):
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
     # return updated dataframe
     print('would be running cases_differential_diagnosis_transformation')
 
 
-def cases_differential_criteria_transformation():
+def cases_differential_criteria_transformation(to_transform_df):
     # Get from logic tab below
     # return updated dataframe
     print('would be running cases_differential_criteria_transformation')
 
 
-def cases_main_cc_transformation(cases_main_file, cc_relations_file, cc_names_file, output_file):
+def cases_main_cc_transformation(df_cases_main):
     # Use case_id to match item_id in table "cc relations", then get the actual name from table "cc names". Separate names by comma (i.e. "A, B, C")
     # return updated dataframe
-    print('would be running cases_main_cc_transformation')
+    print('running cases_main_cc_transformation')
 
-    # # Load the "cases main" table
-    # df_cases_main = pd.read_excel(f"original/{cases_main_file}")
+    # Load the "cc relations" table
+    df_relations = pd.read_excel(f"original/cc relations.xlsx")
 
-    # # Load the "cc relations" table
-    # df_relations = pd.read_excel(f"original/{cc_relations_file}")
+    # load the "cc names" table
+    df_names = pd.read_excel(f"original/cc names.xlsx")
 
-    # # load the "cc names" table
-    # df_names = pd.read_excel(f"original/{cc_names_file}")
+    # Create a dictionary to map ID to nerve/muscle names
+    name_dict = df_names.set_index(
+        'item_id')['item_name'].apply(str.strip).to_dict()
 
-    # # Create a dictionary to map ID to nerve/muscle names
-    # name_dict = df_names.set_index(
-    #     'item_id')['item_name'].apply(str.strip).to_dict()
+    # Loop through each row in the "cases main" table
+    for index, row in df_cases_main.iterrows():
+        # Create a list to hold the names of the cc's
+        cc_names = []
 
-    # # Loop through each row in the "cases main" table
-    # for index, row in df_cases_main.iterrows():
-    #     # Create a list to hold the names of the cc's
-    #     cc_names = []
+        # Loop through each row in the "cc relations" table
+        for index2, row2 in df_relations.iterrows():
+            # If the case_id in the "cc relations" table matches the current case_id in the "cases main" table, add the name of the cc to the list
+            if row2['case_id'] == row['case_id']:
+                cc_names.append(name_dict[row2['item_id']])
 
-    #     # Loop through each row in the "cc relations" table
-    #     for index2, row2 in df_relations.iterrows():
-    #         # If the case_id in the "cc relations" table matches the current case_id in the "cases main" table, add the name of the cc to the list
-    #         if row2['case_id'] == row['case_id']:
-    #             cc_names.append(name_dict[row2['item_id']])
+        # Add the list of cc names to the "cc" column in the "cases main" table
+        df_cases_main.at[index, 'CC'] = ', '.join(cc_names)
 
-    #     # Add the list of cc names to the "cc" column in the "cases main" table
-    #     df_cases_main.at[index, 'CC'] = ', '.join(cc_names)
-
-    # # Save the modified "cases main" table with utf-8 encoding
-    # df_cases_main.to_excel(f"transformed/{output_file}", index=False)
+    # return the updated dataframe
+    return df_cases_main
 
 
-def muscles_main_root_transformation():
+def muscles_main_root_transformation(to_transform_df):
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
     # return updated dataframe
     print('would be running muscles_main_root_transformation')
 
 
-def modules_main_cases_transformation():
+def modules_main_cases_transformation(to_transform_df):
     # Create comma separated list by matching ID with "module_id" from table "module cases (to destroy)" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
     # return updated dataframe
     print('would be running modules_main_cases_transformation')
