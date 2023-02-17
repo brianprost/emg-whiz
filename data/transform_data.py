@@ -169,17 +169,25 @@ def main():
                 # read in the file_with_name file
                 if not column_transformation.get('isDelete'):
                     with_name_df = pd.read_excel(
-                    f'original/{column_transformation["file_with_name"]}')
+                        f'original/{column_transformation["file_with_name"]}')
 
                 # Run the simple transformation
                 simple_transformation(column_transformation)
             else:
                 try:
                     # Get the transformation function from the transformations_dict
-                    to_transform_df = transformations_dict[column_transformation['transformation']](to_transform_df)
+                    to_transform_df = transformations_dict[column_transformation['transformation']](
+                        to_transform_df)
 
                 except Exception as e:
-                    print(f'\n\nError in {column_transformation}\nError was {e}\n\n')
+                    print(
+                        f'\n\nError in {column_transformation}\nError was {e}\n\n')
+
+        # If the export_file_name is specified, then export the transformed file
+        if file_transformation.get('export_file_name'):
+            # Export the transformed file
+            to_transform_df.to_excel(
+                f'transformed/{file_transformation["export_file_name"]}', index=False)
 
 
 def simple_transformation(column_transformation):
