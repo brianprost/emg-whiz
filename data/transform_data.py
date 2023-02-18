@@ -54,6 +54,7 @@ file_transformations = [
                 'transformation': 'cases_diagnosis_emg_criteria_transformation'
             },
         ],
+        'export_file_name': 'cases diagnoses transformed.xlsx',
     },
     {
         'file_to_transform': 'cases differential.xlsx',
@@ -71,6 +72,7 @@ file_transformations = [
                 'transformation': 'cases_differential_criteria_transformation'
             },
         ],
+        'export_file_name': 'cases differential transformed.xlsx',
     },
     {
         'file_to_transform': 'cases main.xlsx',
@@ -112,6 +114,7 @@ file_transformations = [
             #     'column_to_transform': 'ID',
             # },
         ],
+        'export_file_name': 'modules main transformed.xlsx',
     },
     {
         'file_to_transform': 'muscles main.xlsx',
@@ -125,6 +128,7 @@ file_transformations = [
             #     'column_to_transform': 'ID',
             # },
         ],
+        'export_file_name': 'muscles main transformed.xlsx',
     }
     # {
     #     'file_to_transform': 'nerves main.xlsx',
@@ -135,6 +139,7 @@ file_transformations = [
     #             'column_to_transform': 'ID',
     #         },
     #     ],
+    #     'export_file_name': 'nerves main transformed.xlsx',
     # }
 ]
 
@@ -181,9 +186,6 @@ def main():
                 except Exception as e:
                     print(
                         f'\n\n    OH SHIT    \n\nError in {column_transformation}\nError was {e}\n\n')
-
-        # If the export_file_name is specified, then export the transformed file
-        if file_transformation.get('export_file_name'):
             # Export the transformed file
             to_transform_df.to_excel(
                 f'transformed/{file_transformation["export_file_name"]}', index=False)
@@ -232,7 +234,25 @@ def cases_diagnosis_diagnosis_transformation(to_transform_df):
 def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     # Get from table "diagnoses relations (to destroy)" columns ns_compounds and ns_logic
     # return updated dataframe
-    print('would be running cases_diagnosis_ncs_criteria_transformation')
+    print('running cases_diagnosis_ncs_criteria_transformation')
+
+    # Read in the diagnoses relations (to destroy) file
+    diagnoses_relations_df = pd.read_excel('original/diagnoses relations (to destroy).xlsx')
+
+    # Create a dictionary to map ID to ncs criteria
+    name_dict = diagnoses_relations_df.set_index('Diagnosis')['ns_compounds'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs criteria
+    to_transform_df['Criteria'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    # Create a dictionary to map ID to ncs logic
+    name_dict = diagnoses_relations_df.set_index('Diagnosis')['ns_logic'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
+
+    to_transform_df['Logic'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    return to_transform_df
 
 
 def cases_diagnosis_emg_criteria_transformation(to_transform_df):
