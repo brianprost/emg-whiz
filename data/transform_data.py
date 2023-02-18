@@ -214,7 +214,19 @@ def simple_transformation(to_transform_df, with_name_df, column_transformation):
 def cases_diagnosis_diagnosis_transformation(to_transform_df):
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
     # return updated dataframe
-    print('would be running cases_diagnosis_diagnosis_transformation')
+    print('running cases_diagnosis_diagnosis_transformation')
+
+    # Read in the diagnoses names (to destroy) file
+    diagnoses_names_df = pd.read_excel('original/diagnoses names (to destroy).xlsx')
+
+    # Create a dictionary to map ID to diagnosis names
+    name_dict = diagnoses_names_df.set_index('Diagnosis')['diag_name'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding diagnosis name
+
+    to_transform_df['Diagnosis'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    return to_transform_df
 
 
 def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
