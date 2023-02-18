@@ -47,12 +47,12 @@ file_transformations = [
                 'column_with_name': 'diag_name',
                 'primary_key': 'diag_name_id',
             },
-            # {
-            #     'transformation': 'cases_diagnosis_ncs_criteria_transformation'
-            # },
-            # {
-            #     'transformation': 'cases_diagnosis_emg_criteria_transformation'
-            # },
+            {
+                'transformation': 'cases_diagnosis_ncs_criteria_transformation'
+            },
+            {
+                'transformation': 'cases_diagnosis_emg_criteria_transformation'
+            },
         ],
         'export_file_name': 'cases diagnoses transformed.xlsx',
     },
@@ -181,13 +181,9 @@ def main():
                     to_transform_df = simple_transformation(
                         to_transform_df, with_name_df, column_transformation)
                 else:
-                    try:
-                        # Get the transformation function from the transformations_dict
-                        to_transform_df = transformations_dict[column_transformation['transformation']](
-                            to_transform_df)
-                    except Exception as e:
-                        print(
-                            f'\n\n    OH SHIT    \n\nError in {column_transformation}\nError was {e}\n\n')
+                    # Get the transformation function from the transformations_dict
+                    to_transform_df = transformations_dict[column_transformation['transformation']](
+                        to_transform_df)
                 # Export the transformed file
                 to_transform_df.to_excel(
                     f'transformed/{file_transformation["export_file_name"]}', index=False)
@@ -276,6 +272,8 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     diagnoses_relations_df = pd.read_excel(
         'original/diagnoses relations (to destroy).xlsx')
 
+    # first, we'll populate ms_compounds, and then we'll do ms_logic
+
     # Create a dictionary to map ID to emg criteria
     name_dict = diagnoses_relations_df.set_index(
         'Diagnosis')['ms_compounds'].to_dict()
@@ -288,8 +286,17 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
         'Diagnosis')['ms_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
-
     to_transform_df['Logic'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    # now, we'll do ms_logic. But instead of replacing the field, we'll append to it
+
+    # Create a dictionary to map ID to emg logic
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ms_logic'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
+    to_transform_df['Logic'] = to_transform_df['Logic'] + \
+        to_transform_df['Diagnosis'].map(name_dict)
 
     return to_transform_df
 
