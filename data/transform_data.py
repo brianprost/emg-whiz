@@ -47,12 +47,12 @@ file_transformations = [
                 'column_with_name': 'diag_name',
                 'primary_key': 'diag_name_id',
             },
-            {
-                'transformation': 'cases_diagnosis_ncs_criteria_transformation'
-            },
-            {
-                'transformation': 'cases_diagnosis_emg_criteria_transformation'
-            },
+            # {
+            #     'transformation': 'cases_diagnosis_ncs_criteria_transformation'
+            # },
+            # {
+            #     'transformation': 'cases_diagnosis_emg_criteria_transformation'
+            # },
         ],
         'export_file_name': 'cases diagnoses transformed.xlsx',
     },
@@ -157,38 +157,43 @@ def main():
         'modules_main_cases_transformation': modules_main_cases_transformation,
     }
 
-    # Loop through the file transformations objects
-    for file_transformation in file_transformations:
-        print(f'\n\nStarting {file_transformation["file_to_transform"]}')
+    try:
+        # Loop through the file transformations objects
+        for file_transformation in file_transformations:
+            print(f'\n\nStarting {file_transformation["file_to_transform"]}')
 
-        # Read in the file_to_transform file
-        to_transform_df = pd.read_excel(
-            f'original/{file_transformation["file_to_transform"]}')
+            # Read in the file_to_transform file
+            to_transform_df = pd.read_excel(
+                f'original/{file_transformation["file_to_transform"]}')
 
-        # sequentially loop through each column transformations objects
-        for column_transformation in file_transformation['column_transformations']:
+            # sequentially loop through each column transformations objects
+            for column_transformation in file_transformation['column_transformations']:
 
-            # if this transformation is a simple transformation, then run it
-            if column_transformation.get('transformation') == 'simple_transformation':
+                # if this transformation is a simple transformation, then run it
+                if column_transformation.get('transformation') == 'simple_transformation':
 
-                # read in the file_with_name file
-                if not column_transformation.get('isDelete'):
-                    with_name_df = pd.read_excel(
-                        f'original/{column_transformation["file_with_name"]}')
+                    # read in the file_with_name file
+                    if not column_transformation.get('isDelete'):
+                        with_name_df = pd.read_excel(
+                            f'original/{column_transformation["file_with_name"]}')
 
-                # Run the simple transformation
-                to_transform_df = simple_transformation(to_transform_df, with_name_df, column_transformation)
-            else:
-                try:
-                    # Get the transformation function from the transformations_dict
-                    to_transform_df = transformations_dict[column_transformation['transformation']](
-                        to_transform_df)
-                except Exception as e:
-                    print(
-                        f'\n\n    OH SHIT    \n\nError in {column_transformation}\nError was {e}\n\n')
-            # Export the transformed file
-            to_transform_df.to_excel(
-                f'transformed/{file_transformation["export_file_name"]}', index=False)
+                    # Run the simple transformation
+                    to_transform_df = simple_transformation(
+                        to_transform_df, with_name_df, column_transformation)
+                else:
+                    try:
+                        # Get the transformation function from the transformations_dict
+                        to_transform_df = transformations_dict[column_transformation['transformation']](
+                            to_transform_df)
+                    except Exception as e:
+                        print(
+                            f'\n\n    OH SHIT    \n\nError in {column_transformation}\nError was {e}\n\n')
+                # Export the transformed file
+                to_transform_df.to_excel(
+                    f'transformed/{file_transformation["export_file_name"]}', index=False)
+    except Exception as e:
+        # print but in red
+        print(f'\033[91mError was {e}\033[0m')
 
 
 def simple_transformation(to_transform_df, with_name_df, column_transformation):
@@ -199,8 +204,10 @@ def simple_transformation(to_transform_df, with_name_df, column_transformation):
     print(f"    {json.dumps(column_transformation, indent=4)}")
     # If the column is to be deleted, delete it and continue to the next column transformation
     if column_transformation['isDelete']:
-        print(f"    Deleting column: {column_transformation['column_to_transform']}")
-        print(f"typeof to_transform_df[column_transformation['column_to_transform']]: {type(to_transform_df[column_transformation['column_to_transform']])}")
+        print(
+            f"    Deleting column: {column_transformation['column_to_transform']}")
+        print(
+            f"typeof to_transform_df[column_transformation['column_to_transform']]: {type(to_transform_df[column_transformation['column_to_transform']])}")
         del to_transform_df[column_transformation['column_to_transform']]
     else:
         # Create a dictionary to map ID to nerve/muscle names
@@ -219,10 +226,12 @@ def cases_diagnosis_diagnosis_transformation(to_transform_df):
     print('running cases_diagnosis_diagnosis_transformation')
 
     # Read in the diagnoses names (to destroy) file
-    diagnoses_names_df = pd.read_excel('original/diagnoses names (to destroy).xlsx')
+    diagnoses_names_df = pd.read_excel(
+        'original/diagnoses names (to destroy).xlsx')
 
     # Create a dictionary to map ID to diagnosis names
-    name_dict = diagnoses_names_df.set_index('Diagnosis')['diag_name'].to_dict()
+    name_dict = diagnoses_names_df.set_index(
+        'Diagnosis')['diag_name'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding diagnosis name
 
@@ -237,16 +246,19 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     print('running cases_diagnosis_ncs_criteria_transformation')
 
     # Read in the diagnoses relations (to destroy) file
-    diagnoses_relations_df = pd.read_excel('original/diagnoses relations (to destroy).xlsx')
+    diagnoses_relations_df = pd.read_excel(
+        'original/diagnoses relations (to destroy).xlsx')
 
     # Create a dictionary to map ID to ncs criteria
-    name_dict = diagnoses_relations_df.set_index('Diagnosis')['ns_compounds'].to_dict()
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ns_compounds'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs criteria
     to_transform_df['Criteria'] = to_transform_df['Diagnosis'].map(name_dict)
 
     # Create a dictionary to map ID to ncs logic
-    name_dict = diagnoses_relations_df.set_index('Diagnosis')['ns_logic'].to_dict()
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ns_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
 
@@ -258,19 +270,92 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
 def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # Get from table "diagnoses relations (to destroy)" columns ms_compounds and ms_logic
     # return updated dataframe
-    print('would be running cases_diagnosis_emg_criteria_transformation')
+    print('running cases_diagnosis_emg_criteria_transformation')
+
+    # Read in the diagnoses relations (to destroy) file
+    diagnoses_relations_df = pd.read_excel(
+        'original/diagnoses relations (to destroy).xlsx')
+
+    # Create a dictionary to map ID to emg criteria
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ms_compounds'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding emg criteria
+    to_transform_df['Criteria'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    # Create a dictionary to map ID to emg logic
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ms_logic'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
+
+    to_transform_df['Logic'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    return to_transform_df
 
 
 def cases_differential_diagnosis_transformation(to_transform_df):
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
     # return updated dataframe
-    print('would be running cases_differential_diagnosis_transformation')
+    print('running cases_differential_diagnosis_transformation')
+
+    # Read in the diagnoses names (to destroy) file
+    diagnoses_names_df = pd.read_excel(
+        'original/diagnoses names (to destroy).xlsx')
+
+    # Create a dictionary to map ID to diagnosis names
+    name_dict = diagnoses_names_df.set_index(
+        'Diagnosis')['diag_name'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding diagnosis name
+
+    to_transform_df['Diagnosis'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    return to_transform_df
 
 
 def cases_differential_criteria_transformation(to_transform_df):
     # Get from logic tab below
     # return updated dataframe
-    print('would be running cases_differential_criteria_transformation')
+    print('running cases_differential_criteria_transformation')
+
+    # Read in the diagnoses relations (to destroy) file
+    diagnoses_relations_df = pd.read_excel(
+        'original/diagnoses relations (to destroy).xlsx')
+
+    # Create a dictionary to map ID to ncs criteria
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ns_compounds'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs criteria
+    to_transform_df['NCS Criteria'] = to_transform_df['Diagnosis'].map(
+        name_dict)
+
+    # Create a dictionary to map ID to ncs logic
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ns_logic'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
+
+    to_transform_df['NCS Logic'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    # Create a dictionary to map ID to emg criteria
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ms_compounds'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding emg criteria
+    to_transform_df['EMG Criteria'] = to_transform_df['Diagnosis'].map(
+        name_dict)
+
+    # Create a dictionary to map ID to emg logic
+    name_dict = diagnoses_relations_df.set_index(
+        'Diagnosis')['ms_logic'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
+
+    to_transform_df['EMG Logic'] = to_transform_df['Diagnosis'].map(name_dict)
+
+    return to_transform_df
 
 
 def cases_main_cc_transformation(df_cases_main):
