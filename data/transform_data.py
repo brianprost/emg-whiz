@@ -75,11 +75,11 @@ file_transformations = [
     {
         'file_to_transform': 'cases main.xlsx',
         'column_transformations': [
-            {
-                'transformation': 'simple_transformation',
-                'isDelete': True,
-                'column_to_transform': 'case_num',
-            },
+            # {
+            #     'transformation': 'simple_transformation',
+            #     'isDelete': True,
+            #     'column_to_transform': 'case_num',
+            # },
             {
                 'transformation': 'cases_main_cc_transformation',
             },
@@ -104,13 +104,13 @@ file_transformations = [
         'file_to_transform': 'modules main.xlsx',
         'column_transformations': [
             {
-                'transformation': 'simple_transformation',
-                'isDelete': True,
-                'column_to_transform': 'ID',
-            },
-            {
                 'transformation': 'modules_main_cases_transformation',
             },
+            # {
+            #     'transformation': 'simple_transformation',
+            #     'isDelete': True,
+            #     'column_to_transform': 'ID',
+            # },
         ],
     },
     {
@@ -119,23 +119,23 @@ file_transformations = [
             {
                 'transformation': 'muscles_main_root_transformation',
             },
-            {
-                'transformation': 'simple_transformation',
-                'isDelete': True,
-                'column_to_transform': 'ID',
-            },
-        ],
-    },
-    {
-        'file_to_transform': 'nerves main.xlsx',
-        'column_transformations': [
-            {
-                'transformation': 'simple_transformation',
-                'isDelete': True,
-                'column_to_transform': 'ID',
-            },
+            # {
+            #     'transformation': 'simple_transformation',
+            #     'isDelete': True,
+            #     'column_to_transform': 'ID',
+            # },
         ],
     }
+    # {
+    #     'file_to_transform': 'nerves main.xlsx',
+    #     'column_transformations': [
+    #         {
+    #             'transformation': 'simple_transformation',
+    #             'isDelete': True,
+    #             'column_to_transform': 'ID',
+    #         },
+    #     ],
+    # }
 ]
 
 
@@ -178,7 +178,6 @@ def main():
                     # Get the transformation function from the transformations_dict
                     to_transform_df = transformations_dict[column_transformation['transformation']](
                         to_transform_df)
-
                 except Exception as e:
                     print(
                         f'\n\n    OH SHIT    \n\nError in {column_transformation}\nError was {e}\n\n')
@@ -198,17 +197,17 @@ def simple_transformation(to_transform_df, with_name_df, column_transformation):
     print(f"    {json.dumps(column_transformation, indent=4)}")
     # If the column is to be deleted, delete it and continue to the next column transformation
     if column_transformation['isDelete']:
+        print(f"    Deleting column: {column_transformation['column_to_transform']}")
+        print(f"typeof to_transform_df[column_transformation['column_to_transform']]: {type(to_transform_df[column_transformation['column_to_transform']])}")
         del to_transform_df[column_transformation['column_to_transform']]
-        return to_transform_df
+    else:
+        # Create a dictionary to map ID to nerve/muscle names
+        name_dict = with_name_df.set_index(
+            column_transformation['primary_key'])[column_transformation['column_with_name']].to_dict()
 
-    # Create a dictionary to map ID to nerve/muscle names
-    name_dict = with_name_df.set_index(
-        column_transformation['primary_key'])[column_transformation['column_with_name']].to_dict()
-
-    # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
-    to_transform_df[column_transformation['column_to_transform']] = to_transform_df[column_transformation['column_to_transform']].map(
-        name_dict)
-
+        # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
+        to_transform_df[column_transformation['column_to_transform']] = to_transform_df[column_transformation['column_to_transform']].map(
+            name_dict)
     return to_transform_df
 
 
