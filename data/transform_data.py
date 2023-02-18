@@ -1,3 +1,4 @@
+import json
 import pandas as pd
 import shutil
 import sys
@@ -141,7 +142,6 @@ file_transformations = [
 def main():
     transformations_dict = {
         'simple_transformation': simple_transformation,
-        'simple_transformation': simple_transformation,
         'cases_diagnosis_diagnosis_transformation': cases_diagnosis_diagnosis_transformation,
         'cases_diagnosis_ncs_criteria_transformation': cases_diagnosis_ncs_criteria_transformation,
         'cases_diagnosis_emg_criteria_transformation': cases_diagnosis_emg_criteria_transformation,
@@ -172,7 +172,7 @@ def main():
                         f'original/{column_transformation["file_with_name"]}')
 
                 # Run the simple transformation
-                simple_transformation(column_transformation)
+                to_transform_df = simple_transformation(to_transform_df, with_name_df, column_transformation)
             else:
                 try:
                     # Get the transformation function from the transformations_dict
@@ -181,7 +181,7 @@ def main():
 
                 except Exception as e:
                     print(
-                        f'\n\nError in {column_transformation}\nError was {e}\n\n')
+                        f'\n\n    OH SHIT    \n\nError in {column_transformation}\nError was {e}\n\n')
 
         # If the export_file_name is specified, then export the transformed file
         if file_transformation.get('export_file_name'):
@@ -190,23 +190,26 @@ def main():
                 f'transformed/{file_transformation["export_file_name"]}', index=False)
 
 
-def simple_transformation(column_transformation):
+def simple_transformation(to_transform_df, with_name_df, column_transformation):
     # return updated dataframe
 
-    print('would be running simple_transformation')
-    # # If the column is to be deleted, delete it and continue to the next column transformation
-    # if column_transformation['isDelete']:
-    #     del to_transform_df[column_to_transform]
+    print(f"    Starting {column_transformation['column_to_transform']}")
+    # print as json column_transformation
+    print(f"    {json.dumps(column_transformation, indent=4)}")
+    # If the column is to be deleted, delete it and continue to the next column transformation
+    if column_transformation['isDelete']:
+        del to_transform_df[column_transformation['column_to_transform']]
+        return to_transform_df
 
-    # # Create a dictionary to map ID to nerve/muscle names
-    # name_dict = with_name_df.set_index(
-    #     primary_key)[column_with_name].to_dict()
+    # Create a dictionary to map ID to nerve/muscle names
+    name_dict = with_name_df.set_index(
+        column_transformation['primary_key'])[column_transformation['column_with_name']].to_dict()
 
-    # # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
-    # to_transform_df[column_to_transform] = to_transform_df[column_to_transform].map(
-    #     name_dict)
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding nerve/muscle name
+    to_transform_df[column_transformation['column_to_transform']] = to_transform_df[column_transformation['column_to_transform']].map(
+        name_dict)
 
-    # return to_transform_df
+    return to_transform_df
 
 
 def cases_diagnosis_diagnosis_transformation(to_transform_df):
