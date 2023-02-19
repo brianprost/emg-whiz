@@ -77,11 +77,11 @@ file_transformations = [
     {
         'file_to_transform': 'cases main.xlsx',
         'column_transformations': [
-            # {
-            #     'transformation': 'simple_transformation',
-            #     'isDelete': True,
-            #     'column_to_transform': 'case_num',
-            # },
+            {
+                'transformation': 'simple_transformation',
+                'isDelete': True,
+                'column_to_transform': 'case_num',
+            },
             {
                 'transformation': 'cases_main_cc_transformation',
             },
@@ -108,11 +108,11 @@ file_transformations = [
             {
                 'transformation': 'modules_main_cases_transformation',
             },
-            # {
-            #     'transformation': 'simple_transformation',
-            #     'isDelete': True,
-            #     'column_to_transform': 'ID',
-            # },
+            {
+                'transformation': 'simple_transformation',
+                'isDelete': True,
+                'column_to_transform': 'ID',
+            },
         ],
         'export_file_name': 'modules main transformed.xlsx',
     },
@@ -122,25 +122,25 @@ file_transformations = [
             {
                 'transformation': 'muscles_main_root_transformation',
             },
-            # {
-            #     'transformation': 'simple_transformation',
-            #     'isDelete': True,
-            #     'column_to_transform': 'ID',
-            # },
+            {
+                'transformation': 'simple_transformation',
+                'isDelete': True,
+                'column_to_transform': 'ID',
+            },
         ],
         'export_file_name': 'muscles main transformed.xlsx',
+    },
+    {
+        'file_to_transform': 'nerves main.xlsx',
+        'column_transformations': [
+            {
+                'transformation': 'simple_transformation',
+                'isDelete': True,
+                'column_to_transform': 'ID',
+            },
+        ],
+        'export_file_name': 'nerves main transformed.xlsx',
     }
-    # {
-    #     'file_to_transform': 'nerves main.xlsx',
-    #     'column_transformations': [
-    #         {
-    #             'transformation': 'simple_transformation',
-    #             'isDelete': True,
-    #             'column_to_transform': 'ID',
-    #         },
-    #     ],
-    #     'export_file_name': 'nerves main transformed.xlsx',
-    # }
 ]
 
 
@@ -157,53 +157,44 @@ def main():
         'modules_main_cases_transformation': modules_main_cases_transformation,
     }
 
-    try:
-        # Loop through the file transformations objects
-        for file_transformation in file_transformations:
-            print(f'\n\nStarting {file_transformation["file_to_transform"]}')
+    # Loop through the file transformations objects
+    for file_transformation in file_transformations:
+        print(f'\n\nStarting {file_transformation["file_to_transform"]}')
 
-            # Read in the file_to_transform file
-            to_transform_df = pd.read_excel(
-                f'original/{file_transformation["file_to_transform"]}')
+        # Read in the file_to_transform file
+        to_transform_df = pd.read_excel(
+            f'original/{file_transformation["file_to_transform"]}')
 
-            # sequentially loop through each column transformations objects
-            for column_transformation in file_transformation['column_transformations']:
+        # sequentially loop through each column transformations objects
+        for column_transformation in file_transformation['column_transformations']:
 
-                # if this transformation is a simple transformation, then run it
-                if column_transformation.get('transformation') == 'simple_transformation':
+            # if this transformation is a simple transformation, then run it
+            if column_transformation.get('transformation') == 'simple_transformation':
 
-                    # read in the file_with_name file
-                    if not column_transformation.get('isDelete'):
-                        with_name_df = pd.read_excel(
-                            f'original/{column_transformation["file_with_name"]}')
+                # read in the file_with_name file
+                if not column_transformation.get('isDelete'):
+                    with_name_df = pd.read_excel(
+                        f'original/{column_transformation["file_with_name"]}')
 
-                    # Run the simple transformation
-                    to_transform_df = simple_transformation(
-                        to_transform_df, with_name_df, column_transformation)
-                else:
-                    # Get the transformation function from the transformations_dict
-                    to_transform_df = transformations_dict[column_transformation['transformation']](
-                        to_transform_df)
-                # Export the transformed file
-                to_transform_df.to_excel(
-                    f'transformed/{file_transformation["export_file_name"]}', index=False)
-    except Exception as e:
-        # print but in red
-        print(f'\033[91mError was {e}\033[0m')
+                # Run the simple transformation
+                to_transform_df = simple_transformation(
+                    to_transform_df, with_name_df, column_transformation)
+            else:
+                # Get the transformation function from the transformations_dict
+                to_transform_df = transformations_dict[column_transformation['transformation']](
+                    to_transform_df)
+            # Export the transformed file
+            to_transform_df.to_excel(
+                f'transformed/{file_transformation["export_file_name"]}', index=False)
 
 
 def simple_transformation(to_transform_df, with_name_df, column_transformation):
-    # return updated dataframe
+    # replace the ID in the file_to_transform file with the corresponding nerve/muscle name
 
-    print(f"    Starting {column_transformation['column_to_transform']}")
-    # print as json column_transformation
-    print(f"    {json.dumps(column_transformation, indent=4)}")
     # If the column is to be deleted, delete it and continue to the next column transformation
     if column_transformation['isDelete']:
         print(
             f"    Deleting column: {column_transformation['column_to_transform']}")
-        print(
-            f"typeof to_transform_df[column_transformation['column_to_transform']]: {type(to_transform_df[column_transformation['column_to_transform']])}")
         del to_transform_df[column_transformation['column_to_transform']]
     else:
         # Create a dictionary to map ID to nerve/muscle names
@@ -247,18 +238,18 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to ncs criteria
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ns_compounds'].to_dict()
+        'case_id')['ns_compounds'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs criteria
-    to_transform_df['Criteria'] = to_transform_df['Diagnosis'].map(name_dict)
+    to_transform_df['NCS Criteria'] = to_transform_df['Case'].map(name_dict)
 
     # Create a dictionary to map ID to ncs logic
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ns_logic'].to_dict()
+        'case_id')['ns_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
 
-    to_transform_df['Logic'] = to_transform_df['Diagnosis'].map(name_dict)
+    to_transform_df['Logic'] = to_transform_df['Case'].map(name_dict)
 
     return to_transform_df
 
@@ -401,13 +392,48 @@ def cases_main_cc_transformation(df_cases_main):
 def muscles_main_root_transformation(to_transform_df):
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
     # return updated dataframe
-    print('would be running muscles_main_root_transformation')
+    print('running muscles_main_root_transformation')
+
+    # Read in the muscles roots (to destroy) file
+    muscles_roots_df = pd.read_excel(
+        'original/muscles roots (to destroy).xlsx')
+
+    # Create a dictionary to map ID to root names
+    name_dict = muscles_roots_df.set_index(
+        'ID')['Name'].apply(str.strip).to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding root name
+    to_transform_df['Root'] = to_transform_df['ID'].map(name_dict)
+
+    # Create a dictionary to map ID to important
+    name_dict = muscles_roots_df.set_index(
+        'ID')['Important?'].apply(str.strip).to_dict()
+
+    # create, but don't fill an important column
+    to_transform_df['Important'] = ''
+
+    # create temp column to hold important
+    to_transform_df['Important'] = to_transform_df['ID'].map(name_dict)
+
+    # Loop through each row in the "muscles main" table
+    for index, row in to_transform_df.iterrows():
+        # If the important column is "Y", add a "+" to the end of the root name
+        if row['Important'] == 'Y':
+            to_transform_df.at[index, 'Root'] = row['Root'] + '+'
+
+        # If the important column is "N", add a "-" to the end of the root name
+        elif row['Important'] == 'N':
+            to_transform_df.at[index, 'Root'] = row['Root'] + '-'
+
+    return to_transform_df
 
 
 def modules_main_cases_transformation(to_transform_df):
     # Create comma separated list by matching ID with "module_id" from table "module cases (to destroy)" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
     # return updated dataframe
     print('would be running modules_main_cases_transformation')
+
+    return to_transform_df
 
 
 def to_xlsx(file_name, sheet_name, df):
