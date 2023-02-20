@@ -267,14 +267,14 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to emg criteria
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ms_compounds'].to_dict()
+        'case_id')['ms_compounds'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg criteria
-    to_transform_df['Criteria'] = to_transform_df['Diagnosis'].map(name_dict)
+    to_transform_df['EMG Criteria'] = to_transform_df['Case'].map(name_dict)
 
     # Create a dictionary to map ID to emg logic
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ms_logic'].to_dict()
+        'case_id')['ms_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
     to_transform_df['Logic'] = to_transform_df['Diagnosis'].map(name_dict)
@@ -283,7 +283,7 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to emg logic
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ms_logic'].to_dict()
+        'case_id')['ms_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
     to_transform_df['Logic'] = to_transform_df['Logic'] + \
@@ -303,11 +303,11 @@ def cases_differential_diagnosis_transformation(to_transform_df):
 
     # Create a dictionary to map ID to diagnosis names
     name_dict = diagnoses_names_df.set_index(
-        'Diagnosis')['diag_name'].to_dict()
+        'case_id')['diag_name'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding diagnosis name
 
-    to_transform_df['Diagnosis'] = to_transform_df['Diagnosis'].map(name_dict)
+    to_transform_df['Diagnosis'] = to_transform_df['Case'].map(name_dict)
 
     return to_transform_df
 
@@ -323,7 +323,7 @@ def cases_differential_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to ncs criteria
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ns_compounds'].to_dict()
+        'case_id')['ns_compounds'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs criteria
     to_transform_df['NCS Criteria'] = to_transform_df['Diagnosis'].map(
@@ -331,7 +331,7 @@ def cases_differential_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to ncs logic
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ns_logic'].to_dict()
+        'case_id')['ns_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
 
@@ -339,7 +339,7 @@ def cases_differential_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to emg criteria
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ms_compounds'].to_dict()
+        'case_id')['ms_compounds'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg criteria
     to_transform_df['EMG Criteria'] = to_transform_df['Diagnosis'].map(
@@ -347,7 +347,7 @@ def cases_differential_criteria_transformation(to_transform_df):
 
     # Create a dictionary to map ID to emg logic
     name_dict = diagnoses_relations_df.set_index(
-        'Diagnosis')['ms_logic'].to_dict()
+        'case_id')['ms_logic'].to_dict()
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
 
@@ -429,9 +429,51 @@ def muscles_main_root_transformation(to_transform_df):
 
 
 def modules_main_cases_transformation(to_transform_df):
-    # Create comma separated list by matching ID with "module_id" from table "module cases (to destroy)" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
+    # Create comma separated list by matching ID with "module_id" from table "module cases" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
     # return updated dataframe
-    print('would be running modules_main_cases_transformation')
+    print('running modules_main_cases_transformation')
+
+    # Read in the module cases file
+    module_cases_df = pd.read_excel(
+        'original/module cases.xlsx')
+
+    # Read in the cases main file
+    cases_main_df = pd.read_excel('original/cases main.xlsx')
+
+    # Create a dictionary to map ID to case number
+    name_dict = cases_main_df.set_index(
+        'case_id')['case_num'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding case number
+    to_transform_df['Case'] = to_transform_df['ID'].map(name_dict)
+
+    # Create a dictionary to map ID to module ID
+    name_dict = module_cases_df.set_index(
+        'case_id')['module_id'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding module ID
+    to_transform_df['Module ID'] = to_transform_df['ID'].map(name_dict)
+
+    # Read in the modules main file
+    modules_main_df = pd.read_excel('original/modules main.xlsx')
+
+    # Create a dictionary to map ID to module number. module_num needs to be extracted from the last character of the module_name
+    name_dict = modules_main_df.set_index(
+        'ID')['Name'].apply(lambda x: x[-1]).to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding module number
+    to_transform_df['Module'] = to_transform_df['Module ID'].map(name_dict)
+
+    # Create a dictionary to map ID to case order
+    name_dict = module_cases_df.set_index(
+        'case_id')['case_order'].to_dict()
+
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding case order
+    to_transform_df['Case Order'] = to_transform_df['ID'].map(name_dict)
+
+    # Sort the dataframe by module number and case order
+    to_transform_df.sort_values(
+        ['Module', 'Case Order'], inplace=True, ignore_index=True)
 
     return to_transform_df
 
