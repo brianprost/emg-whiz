@@ -226,7 +226,7 @@ def simple_transformation(to_transform_df, with_name_df, column_transformation):
 def cases_diagnosis_diagnosis_transformation(to_transform_df):
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
     # return updated dataframe
-    print('running cases_diagnosis_diagnosis_transformation')
+    print('\trunning cases_diagnosis_diagnosis_transformation')
 
     # Read in the diagnoses names (to destroy) file
     diagnoses_names_df = pd.read_excel(
@@ -246,7 +246,7 @@ def cases_diagnosis_diagnosis_transformation(to_transform_df):
 def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     # Get from table "diagnoses relations (to destroy)" columns ns_compounds and ns_logic
     # return updated dataframe
-    print('running cases_diagnosis_ncs_criteria_transformation')
+    print('\trunning cases_diagnosis_ncs_criteria_transformation')
 
     # Read in the diagnoses relations (to destroy) file
     diagnoses_relations_df = pd.read_excel(
@@ -289,7 +289,7 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
 def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # Get from table "diagnoses relations (to destroy)" columns ms_compounds and ms_logic
     # return updated dataframe
-    print('running cases_diagnosis_emg_criteria_transformation')
+    print('\trunning cases_diagnosis_emg_criteria_transformation')
 
     # Read in the diagnoses relations (to destroy) file
     diagnoses_relations_df = pd.read_excel(
@@ -343,7 +343,7 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
 def cases_differential_diagnosis_transformation(to_transform_df):
     # Get "diag_name" from table "diagnoses names (to destroy)" where Diagnosis = "diag_name_id"
     # return updated dataframe
-    print('running cases_differential_diagnosis_transformation')
+    print('\trunning cases_differential_diagnosis_transformation')
 
     # Read in the diagnoses names (to destroy) file
     diagnoses_names_df = pd.read_excel(
@@ -363,7 +363,7 @@ def cases_differential_diagnosis_transformation(to_transform_df):
 def cases_differential_criteria_transformation(to_transform_df):
     # Get from logic tab below
     # return updated dataframe
-    print('running cases_differential_criteria_transformation')
+    print('\trunning cases_differential_criteria_transformation')
 
     # Read in the diagnoses relations (to destroy) file
     diagnoses_relations_df = pd.read_excel(
@@ -407,7 +407,7 @@ def cases_differential_criteria_transformation(to_transform_df):
 def cases_main_cc_transformation(df_cases_main):
     # Use case_id to match item_id in table "cc relations", then get the actual name from table "cc names". Separate names by comma (i.e. "A, B, C")
     # return updated dataframe
-    print('running cases_main_cc_transformation')
+    print('\trunning cases_main_cc_transformation')
 
     # Load the "cc relations" table
     df_relations = pd.read_excel(f"original/cc relations.xlsx")
@@ -440,7 +440,7 @@ def cases_main_cc_transformation(df_cases_main):
 def muscles_main_root_transformation(to_transform_df):
     # Pull from table "muscles roots (to destroy)" matching ID. Separate multiple with comma, then add + for important = Y or - for important = N. Example for ID1: C6+, C5-
     # return updated dataframe
-    print('running muscles_main_root_transformation')
+    print('\trunning muscles_main_root_transformation')
 
     # Read in the muscles roots (to destroy) file
     muscles_roots_df = pd.read_excel(
@@ -479,7 +479,7 @@ def muscles_main_root_transformation(to_transform_df):
 def modules_main_cases_transformation(to_transform_df):
     # Create comma separated list by matching ID with "module_id" from table "module cases" and then grabbing "case_num" by matching "case_id" from table "cases main", ideally in the order specified by "case_order"
     # return updated dataframe
-    print('running modules_main_cases_transformation')
+    print('\trunning modules_main_cases_transformation')
 
     # Read in the module cases file
     module_cases_df = pd.read_excel(
@@ -529,7 +529,7 @@ def modules_main_cases_transformation(to_transform_df):
 def remove_duplicates(df):
     # Remove duplicate rows
     # return updated dataframe
-    print('running remove_duplicates')
+    print('\trunning remove_duplicates')
 
     # if there are two rows with the same case, then consolidate the diagnosis into one row. so for any duplicate(s) grab the diagnosis name, add it to the first one's name, spearated by a comma, and then delete the duplicate row
 
