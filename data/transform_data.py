@@ -54,6 +54,20 @@ file_transformations = [
             {
                 'transformation': 'cases_diagnosis_emg_criteria_transformation'
             },
+            {
+                'transformation': 'remove_duplicates'
+            },
+            # delete columns NCS Criteria and EMG Criteria
+            {
+                'transformation': 'simple_transformation',
+                'isDelete': True,
+                'column_to_transform': 'NCS Criteria',
+            },
+            {
+                'transformation': 'simple_transformation',
+                'isDelete': True,
+                'column_to_transform': 'EMG Criteria',
+            },
         ],
         'export_file_name': 'cases diagnoses transformed.xlsx',
     },
@@ -156,6 +170,7 @@ def main():
         'cases_main_cc_transformation': cases_main_cc_transformation,
         'muscles_main_root_transformation': muscles_main_root_transformation,
         'modules_main_cases_transformation': modules_main_cases_transformation,
+        'remove_duplicates': remove_duplicates,
     }
 
     # Loop through the file transformations objects
@@ -260,12 +275,13 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     # Create a dictionary to map ID to ncs logic
     logic_dict = diagnoses_relations_df.set_index(
         'case_id')['ns_logic'].to_dict()
-    
+
     logic_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
         r'\d+', lambda m: nerve_name_dict.get(int(m.group()), ''), str(kv[1]))), logic_dict.items()))
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
-    to_transform_df['NCS Logic'] = to_transform_df['Case'].map(logic_dict_but_with_names)
+    to_transform_df['NCS Logic'] = to_transform_df['Case'].map(
+        logic_dict_but_with_names)
 
     return to_transform_df
 
@@ -303,18 +319,23 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # name_dict_but_with_names = dict(map(lambda kv: (muscle_name_dict[kv[0]], kv.get(1, '')), name_dict.items()))
     name_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
         r'\d+', lambda m: muscle_name_dict.get(int(m.group()), ''), str(kv[1]))), name_dict.items()))
+    
+    # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
+    to_transform_df['EMG Criteria'] = to_transform_df['Case'].map(
+        name_dict_but_with_names)
 
     # now, we'll do ms_logic. But instead of replacing the field, we'll append to it
 
     # Create a dictionary to map ID to emg logic
     logic_dict = diagnoses_relations_df.set_index(
         'case_id')['ms_logic'].to_dict()
-    
+
     logic_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
         r'\d+', lambda m: muscle_name_dict.get(int(m.group()), ''), str(kv[1]))), logic_dict.items()))
 
     # Use the map function to replace the ID in to_transform_df file with the corresponding emg logic
-    to_transform_df['EMG Logic'] = to_transform_df['Case'].map(logic_dict_but_with_names)
+    to_transform_df['EMG Logic'] = to_transform_df['Case'].map(
+        logic_dict_but_with_names)
 
     return to_transform_df
 
@@ -503,6 +524,22 @@ def modules_main_cases_transformation(to_transform_df):
         ['Module', 'Case Order'], inplace=True, ignore_index=True)
 
     return to_transform_df
+
+
+def remove_duplicates(df):
+    # Remove duplicate rows
+    # return updated dataframe
+    print('running remove_duplicates')
+
+    # if there are two rows with the same case, then consolidate the diagnosis into one row. so for any duplicate(s) grab the diagnosis name, add it to the first one's name, spearated by a comma, and then delete the duplicate row
+
+    # consolidate the diagnosis column by grouping by "Case"
+    df_grouped = df.groupby('Case')['Diagnosis'].apply(lambda x: ', '.join(x)).reset_index()
+
+    # merge the aggregated diagnosis with the original dataframe, keeping only one row for each unique "Case" value
+    df_final = pd.merge(df_grouped, df[['Case', 'Side', 'NCS Criteria', 'EMG Criteria', 'NCS Logic', 'EMG Logic']].drop_duplicates(), on='Case', how='left')
+
+    return df_final
 
 
 def to_xlsx(file_name, sheet_name, df):
