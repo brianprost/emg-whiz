@@ -260,9 +260,12 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     # Create a dictionary to map ID to ncs logic
     logic_dict = diagnoses_relations_df.set_index(
         'case_id')['ns_logic'].to_dict()
+    
+    logic_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
+        r'\d+', lambda m: nerve_name_dict.get(int(m.group()), ''), str(kv[1]))), logic_dict.items()))
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs logic
-    to_transform_df['NCS Logic'] = to_transform_df['Case'].map(logic_dict)
+    to_transform_df['NCS Logic'] = to_transform_df['Case'].map(logic_dict_but_with_names)
 
     return to_transform_df
 
@@ -306,9 +309,12 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # Create a dictionary to map ID to emg logic
     logic_dict = diagnoses_relations_df.set_index(
         'case_id')['ms_logic'].to_dict()
+    
+    logic_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
+        r'\d+', lambda m: muscle_name_dict.get(int(m.group()), ''), str(kv[1]))), logic_dict.items()))
 
     # Use the map function to replace the ID in to_transform_df file with the corresponding emg logic
-    to_transform_df['EMG Logic'] = to_transform_df['Case'].map(logic_dict)
+    to_transform_df['EMG Logic'] = to_transform_df['Case'].map(logic_dict_but_with_names)
 
     return to_transform_df
 
