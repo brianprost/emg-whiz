@@ -1,4 +1,5 @@
 import json
+import re
 import pandas as pd
 import shutil
 import sys
@@ -236,12 +237,29 @@ def cases_diagnosis_ncs_criteria_transformation(to_transform_df):
     diagnoses_relations_df = pd.read_excel(
         'original/diagnoses relations (to destroy).xlsx')
 
+    # read in nerve names
+    nerves_names_df = pd.read_excel(
+        'original/nerves main.xlsx')
+
     # Create a dictionary to map ID to ncs criteria
     name_dict = diagnoses_relations_df.set_index(
         'case_id')['ns_compounds'].to_dict()
 
+    # create a dictionary of nerve names
+    nerve_name_dict = nerves_names_df.set_index(
+        'ID')['Name'].to_dict()
+
+    print(nerve_name_dict)
+
+    # name_dict_but_with_names = dict(map(lambda kv: (nerve_name_dict[kv[0]], kv.get(1, '')), name_dict.items()))
+    name_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
+        r'\d+', lambda m: nerve_name_dict.get(int(m.group()), ''), str(kv[1]))), name_dict.items()))
+
+    print(name_dict_but_with_names)
+
     # Use the map function to replace the ID in the file_to_transform file with the corresponding ncs criteria
-    to_transform_df['NCS Criteria'] = to_transform_df['Case'].map(name_dict)
+    # however, we need to replace each nerve ID with the nerve name
+    to_transform_df['NCS Criteria'] = to_transform_df['Case'].map(name_dict_but_with_names)
 
     # Create a dictionary to map ID to ncs logic
     name_dict = diagnoses_relations_df.set_index(
@@ -279,6 +297,18 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
     to_transform_df['Logic'] = to_transform_df['Diagnosis'].map(name_dict)
 
+    # read in muscle names
+    muscles_names_df = pd.read_excel(
+        'original/muscles main.xlsx')
+
+    # create a dictionary of muscle names
+    muscle_name_dict = muscles_names_df.set_index(
+        'ID')['Name'].to_dict()
+
+    # name_dict_but_with_names = dict(map(lambda kv: (muscle_name_dict[kv[0]], kv.get(1, '')), name_dict.items()))
+    name_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
+        r'\d+', lambda m: muscle_name_dict.get(int(m.group()), ''), str(kv[1]))), name_dict.items()))
+
     # now, we'll do ms_logic. But instead of replacing the field, we'll append to it
 
     # Create a dictionary to map ID to emg logic
@@ -287,7 +317,7 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
 
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
     to_transform_df['Logic'] = to_transform_df['Logic'] + \
-        to_transform_df['Diagnosis'].map(name_dict)
+        to_transform_df['Diagnosis'].map(name_dict_but_with_names)
 
     return to_transform_df
 
