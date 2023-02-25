@@ -3,6 +3,7 @@ import re
 import pandas as pd
 import shutil
 import sys
+import openpyxl
 
 # delete contents of transformed folder
 shutil.rmtree('transformed')
@@ -199,9 +200,14 @@ def main():
                 # Get the transformation function from the transformations_dict
                 to_transform_df = transformations_dict[column_transformation['transformation']](
                     to_transform_df)
+
+            # make sure there are no `_x000D_` in the file
+            to_transform_df = to_transform_df.replace(
+                to_replace='_x000D_', value='', regex=True)
+
             # Export the transformed file
             to_transform_df.to_excel(
-                f'transformed/{file_transformation["export_file_name"]}', index=False)
+                f'transformed/{file_transformation["export_file_name"]}', engine='openpyxl', index=False)
 
 
 def simple_transformation(to_transform_df, with_name_df, column_transformation):
@@ -319,7 +325,7 @@ def cases_diagnosis_emg_criteria_transformation(to_transform_df):
     # name_dict_but_with_names = dict(map(lambda kv: (muscle_name_dict[kv[0]], kv.get(1, '')), name_dict.items()))
     name_dict_but_with_names = dict(map(lambda kv: (kv[0], re.sub(
         r'\d+', lambda m: muscle_name_dict.get(int(m.group()), ''), str(kv[1]))), name_dict.items()))
-    
+
     # Use the map function to replace the ID in the file_to_transform file with the corresponding emg logic
     to_transform_df['EMG Criteria'] = to_transform_df['Case'].map(
         name_dict_but_with_names)
@@ -534,10 +540,12 @@ def remove_duplicates(df):
     # if there are two rows with the same case, then consolidate the diagnosis into one row. so for any duplicate(s) grab the diagnosis name, add it to the first one's name, spearated by a comma, and then delete the duplicate row
 
     # consolidate the diagnosis column by grouping by "Case"
-    df_grouped = df.groupby('Case')['Diagnosis'].apply(lambda x: ', '.join(x)).reset_index()
+    df_grouped = df.groupby('Case')['Diagnosis'].apply(
+        lambda x: ', '.join(x)).reset_index()
 
     # merge the aggregated diagnosis with the original dataframe, keeping only one row for each unique "Case" value
-    df_final = pd.merge(df_grouped, df[['Case', 'Side', 'NCS Criteria', 'EMG Criteria', 'NCS Logic', 'EMG Logic']].drop_duplicates(), on='Case', how='left')
+    df_final = pd.merge(df_grouped, df[['Case', 'Side', 'NCS Criteria', 'EMG Criteria',
+                        'NCS Logic', 'EMG Logic']].drop_duplicates(), on='Case', how='left')
 
     return df_final
 
