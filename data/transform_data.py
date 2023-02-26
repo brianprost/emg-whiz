@@ -56,7 +56,7 @@ file_transformations = [
                 'transformation': 'cases_diagnosis_emg_criteria_transformation'
             },
             {
-                'transformation': 'remove_duplicates'
+                'transformation': 'remove_duplicates_cases_diagnosis'
             },
             # delete columns NCS Criteria and EMG Criteria
             {
@@ -143,6 +143,9 @@ file_transformations = [
                 'isDelete': True,
                 'column_to_transform': 'ID',
             },
+            {
+                'transformation': 'remove_duplicates_muscles_main',
+            },
         ],
         'export_file_name': 'muscles main transformed.xlsx',
     },
@@ -171,7 +174,8 @@ def main():
         'cases_main_cc_transformation': cases_main_cc_transformation,
         'muscles_main_root_transformation': muscles_main_root_transformation,
         'modules_main_cases_transformation': modules_main_cases_transformation,
-        'remove_duplicates': remove_duplicates,
+        'remove_duplicates_cases_diagnosis': remove_duplicates_cases_diagnosis,
+        'remove_duplicates_muscles_main': remove_duplicates_muscles_main,
     }
 
     # Loop through the file transformations objects
@@ -532,10 +536,10 @@ def modules_main_cases_transformation(to_transform_df):
     return to_transform_df
 
 
-def remove_duplicates(df):
+def remove_duplicates_cases_diagnosis(df):
     # Remove duplicate rows
     # return updated dataframe
-    print('\trunning remove_duplicates')
+    print('\trunning remove_duplicates_cases_diagnosis')
 
     # if there are two rows with the same case, then consolidate the diagnosis into one row. so for any duplicate(s) grab the diagnosis name, add it to the first one's name, spearated by a comma, and then delete the duplicate row
 
@@ -548,6 +552,28 @@ def remove_duplicates(df):
                         'NCS Logic', 'EMG Logic']].drop_duplicates(), on='Case', how='left')
 
     return df_final
+
+
+def remove_duplicates_muscles_main(df):
+    # Remove duplicate rows
+    # return updated dataframe
+    print('\trunning remove_duplicates_muscles_main')
+
+    # if there are two rows with the same muscle, then consolidate the root into one row. so for any duplicate(s) grab the root name, add it to the first one's name, spearated by a comma, and then delete the duplicate row
+
+    # convert everything to a string
+    df = df.astype(str)
+
+    # Remove any leading/trailing whitespace or commas from the columns we want to concatenate
+    df['Name'] = df['Name'].str.strip().str.strip(',')
+    df['Nerve'] = df['Nerve'].str.strip().str.strip(',')
+    df['Trunk'] = df['Trunk'].str.strip().str.strip(',')
+    df['Important'] = df['Important'].str.strip().str.strip(',')
+
+    # Concatenate the values in the columns we want to consolidate
+    df_agg = df.groupby('Root').agg({'Category': 'first', 'Name': ', '.join, 'Nerve': ', '.join, 'Trunk': ', '.join, 'Cord': 'first', 'Important': ', '.join}).reset_index()
+
+    return df_agg
 
 
 def to_xlsx(file_name, sheet_name, df):
