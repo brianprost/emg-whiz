@@ -146,6 +146,9 @@ file_transformations = [
             {
                 'transformation': 'remove_duplicates_muscles_main',
             },
+            {
+                'transformation': 'include_nerve_roots_by_comma'
+            }
         ],
         'export_file_name': 'muscles main transformed.xlsx',
     },
@@ -174,6 +177,7 @@ def main():
         'cases_main_cc_transformation': cases_main_cc_transformation,
         'muscles_main_root_transformation': muscles_main_root_transformation,
         'modules_main_cases_transformation': modules_main_cases_transformation,
+        'include_nerve_roots_by_comma': include_nerve_roots_by_comma,
         'remove_duplicates_cases_diagnosis': remove_duplicates_cases_diagnosis,
         'remove_duplicates_muscles_main': remove_duplicates_muscles_main,
     }
@@ -534,6 +538,54 @@ def modules_main_cases_transformation(to_transform_df):
         ['Module', 'Case Order'], inplace=True, ignore_index=True)
 
     return to_transform_df
+
+
+def include_nerve_roots_by_comma(df):
+    print('\trunning include_nerve_roots_by_comma')
+
+    # file he sent me looks different, so let's just import the CSVs for now
+    muscles_with_ids = pd.read_csv("original/muscles with IDs.csv")
+    muscles_without_roots = pd.read_csv("original/muscles without roots.csv")
+    root_key = pd.read_csv("original/root key.csv")
+
+    muscles_with_ids['muscle_name'] = muscles_with_ids['muscle_name'].str.strip()
+    muscles_without_roots['Name'] = muscles_without_roots['Name'].str.strip()
+
+    # remove extra spaces from columns
+    root_key.columns = root_key.columns.str.strip()
+
+    # Merge dataframes
+    merged_df = muscles_with_ids.merge(root_key, on='muscle_id', how='left')
+
+    # Function to format roots
+    def format_root(row):
+        root_name = row['root_name']
+
+        if isinstance(root_name, str):
+            root_name = root_name.strip()
+        else:
+            return ''
+        
+        if row['root_impt'] == 'Y':
+            return f"{root_name}+"
+        return root_name
+
+    # Apply format_root function to merged dataframe
+    merged_df['formatted_root'] = merged_df.apply(format_root, axis=1)
+
+    # Group dataframe by muscle_id and aggregate formatted roots
+    grouped_df = merged_df.groupby(['muscle_id', 'muscle_name', 'limb_id', 'nerve_name', 'nerve_trunk', 'nerve_cord'])['formatted_root'].apply(', '.join).reset_index()
+
+    # Merge aggregated dataframe with muscles_without_roots
+    final_df = muscles_without_roots.merge(grouped_df, left_on='Name', right_on='muscle_name', how='left')
+
+    # Copy aggregated roots to the Root column
+    final_df['Root'] = final_df['formatted_root']
+
+    # Drop unnecessary columns
+    final_df.drop(columns=['muscle_id', 'muscle_name', 'limb_id', 'nerve_name', 'nerve_trunk', 'nerve_cord', 'formatted_root'], inplace=True)
+
+    return final_df
 
 
 def remove_duplicates_cases_diagnosis(df):

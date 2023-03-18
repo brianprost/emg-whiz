@@ -1,0 +1,81 @@
+"muscle_id","muscle_name","limb_id","nerve_name","nerve_trunk","nerve_cord"
+"1","Brachioradialis","16","Radial","Upper","Posterior"
+"11","Deltoid","16","Axillary","Upper","Posterior"
+"12","Rhomboids","16","Dorsal scapular",,
+"13","Supraspinatus","16","Suprascapular","Upper",
+"14","Infraspinatus","16","Suprascapular","Upper",
+"15","Biceps brachii","16","Musculocutaneous","Upper","Lateral"
+"16","Serratus anterior","16","Long thoracic",,
+"17","Pectoralis major - clavicular","16","Lateral pectoral","Upper","Lateral"
+"18","Pectoralis major - sternocostal","16","Medial pectoral","Middle and lower","Medial"
+"19","Extensor carpi radialis longus","16","Radial","Upper and middle","Posterior"
+"20","Triceps","16","Radial","Upper, middle, and lower","Posterior"
+"21","Extensor carpi ulnaris","16","Radial (posterior interosseus)","Middle and lower","Posterior"
+"22","Extensor digitorum communis","16","Radial (posterior interosseus)","Middle and lower","Posterior"
+"23","Extensor indicis","16","Radial (posterior interosseus)","Middle and lower","Posterior"
+"24","Extensor pollicis longus","16","Radial (posterior interosseus)","Middle and lower","Posterior"
+"25","Abductor pollicis longus","16","Radial (posterior interosseus)","Middle and lower","Posterior"
+"26","Supinator","16","Radial (posterior interosseus)","Upper and middle","Posterior"
+"27","Pronator teres","16","Median","Upper and middle","Lateral"
+"28","Flexor carpi radialis","16","Median","Upper and middle","Lateral"
+"29","Flexor pollicis longus","16","Median (anterior interosseous)","Middle and lower","Lateral and Medial"
+"30","Flexor digitorum profundus 2 & 3","16","Median (anterior interosseous)","Middle and lower","Lateral and Medial"
+"31","Flexor digitorum superficialis","16","Median","Middle and lower","Lateral and Medial"
+"32","Abductor pollicis brevis","16","Median","Lower","Medial"
+"33","Opponens pollicis","16","Median","Lower","Medial"
+"34","Flexor carpi ulnaris","16","Ulnar","Lower","Medial"
+"35","Flexor digitorum profundus 4 & 5","16","Ulnar","Lower","Medial"
+"36","First dorsal interosseous (hand)","16","Ulnar","Lower","Medial"
+"37","Abductor digiti quinti (hand)","16","Ulnar","Lower","Medial"
+"38","Iliopsoas","2","Femoral and plexus",,
+"39","Sartorius","2","Femoral",,
+"40","Rectus femoris","2","Femoral",,
+"41","Vastus lateralis","2","Femoral",,
+"42","Vastus medialis","2","Femoral",,
+"43","Adductor longus","2","Obturator",,
+"44","Gluteus medius","2","Superior gluteal",,
+"45","Gluteus maximus","2","Inferior gluteal",,
+"46","Quadratus femoris","2","Sacral plexus",,
+"47","Peroneus longus","2","Peroneal (superficial)",,
+"48","Peroneus brevis","2","Peroneal (superficial)",,
+"49","Anterior tibialis","2","Peroneal (deep)",,
+"50","Extensor digitorum longus","2","Peroneal (deep)",,
+"51","Extensor hallicis longus","2","Peroneal (deep)",,
+"52","Extensor digitorum brevis","2","Peroneal (deep)",,
+"53","Semitendinosis","2","Sciatic (tibial division)",,
+"54","Semimembranosis","2","Sciatic (tibial division)",,
+"55","Biceps femoris (short head)","2","Sciatic (peroneal division)",,
+"56","Posterior tibialis","2","Tibial",,
+"57","Medial gastrocnemius","2","Tibial",,
+"58","Lateral gastrocnemius","2","Tibial",,
+"59","Abductor hallucis","2","Tibial (medial plantar)",,
+"60","Abductor digiti quinti (foot)","2","Tibial (lateral plantar)",,
+"61","First dorsal interosseus (foot)","2","Tibial (lateral plantar)",,
+"62","Frontalis","4","Facial",,
+"63","Orbicularis oris","4","Facial",,
+"64","Orbicularis oculi","4","Facial",,
+"65","Sternocleidomastoid","4","Spinal Accessory",,
+"66","Trapezius","16","Spinal Accessory",,
+"68","Tongue - Genioglossus","4","Hypoglossal",,
+"69","Latissimus dorsi","16","Thoracodorsal","Upper, middle, and lower","Posterior"
+"77","Pronator quadratus","16","Median (anterior interosseous)","Middle and lower","Lateral and Medial"
+"78","C5 paraspinal","3","Dorsal rami",,
+"79","C6 paraspinal","3","Dorsal rami",,
+"80","C7 paraspinal","3","Dorsal rami",,
+"81","C8 paraspinal","3","Dorsal rami",,
+"82","T1 paraspinal","3","Dorsal rami",,
+"83","T4 paraspinal","3","Dorsal rami",,
+"84","T7 paraspinal","3","Dorsal rami",,
+"85","T10 paraspinal","3","Dorsal rami",,
+"86","L2 paraspinal","3","Dorsal rami",,
+"87","L3 paraspinal","3","Dorsal rami",,
+"88","L4 paraspinal","3","Dorsal rami",,
+"89","L5 paraspinal","3","Dorsal rami",,
+"90","S1 paraspinal","3","Dorsal rami",,
+"91","Mentalis","4","Facial",,
+"92","Masseter","4","Trigeminal (V3)",,
+"93","Biceps femoris (long head)","2","Sciatic (tibial division)",,
+"94","Tensor fasciae latae","2","Superior gluteal",,
+"95","Anconeus","16","Radial","Upper, middle, and lower","Posterior"
+"96","Teres minor","16","Axillary","Upper","Posterior"
+"97","Gracilis","2","Obturator",,
