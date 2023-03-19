@@ -1,5 +1,6 @@
 import json
 import re
+import numpy as np
 import pandas as pd
 import shutil
 import sys
@@ -212,6 +213,10 @@ def main():
             # make sure there are no `_x000D_` in the file
             to_transform_df = to_transform_df.replace(
                 to_replace='_x000D_', value='', regex=True)
+            
+            # remove all `nan` values
+            to_transform_df = to_transform_df.replace(
+                to_replace=np.nan, value='', regex=True)
 
             # Export the transformed file
             to_transform_df.to_excel(
